@@ -1,4 +1,4 @@
-const apiKey = "";
+const apiKey = "sk-proj-xGeorjPeEbFH5GnFtKN2T3BlbkFJbIoAmXwghFY5eE5oCcS3";
 const googleUrl = new URL(window.location.href);
 const search = googleUrl.search;
 const searchParam = new URLSearchParams(search);
