@@ -104,7 +104,7 @@ function App() {
   };
 
   const fetchOpenAiData = async (prompt: string): Promise<string> => {
-    const apiKey = "sk-proj-xGeorjPeEbFH5GnFtKN2T3BlbkFJbIoAmXwghFY5eE5oCcS3";
+    const apiKey = "";
     const url = 'https://api.openai.com/v1/completions';
 
     const response = await fetch(url, {
