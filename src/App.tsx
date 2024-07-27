@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import OptionDetails from './OptionDetails';
+import ChartComponent from './ChartComponent';
 import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 
 interface Option {
@@ -30,6 +31,9 @@ function App() {
   const [askPrice, setAskPrice] = useState<number | null>(null);
   const [previousAskPrice, setPreviousAskPrice] = useState<number | null>(null);
   const [priceColor, setPriceColor] = useState<string>('text-white');
+  const [selectedContractSymbol, setSelectedContractSymbol] = useState<string | null>(null);
+
+  const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     retrieveDataFromStorage(['apiData', 'callsData', 'putsData', 'ticker', 'selectedDate', 'askPrice', 'expirationDates'], (result: { [key: string]: any }) => {
@@ -65,6 +69,12 @@ function App() {
     //reset badge
     chrome.action.setBadgeText({"text": ""}); 
   }, []);
+
+  useEffect(() => {
+    if (selectedContractSymbol && chartRef.current) {
+      chartRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedContractSymbol]);
 
   const retrieveDataFromStorage = (keys: string[], callback: (result: { [key: string]: any }) => void) => {
     if (chrome && chrome.storage && chrome.storage.local) {
@@ -235,6 +245,10 @@ function App() {
     }
   };
 
+  const handleContractSymbolClick = (contractSymbol: string) => {
+    setSelectedContractSymbol(contractSymbol);
+  };  
+
   return (
     <div className="container p-4 pt-4 mx-auto bg-gray-900 min-w-[320px]">
       {askPrice !== null && (
@@ -263,7 +277,7 @@ function App() {
         </div>
       </div>
       <p className="mb-4 mx-16 text-white text-left">
-        <b>AI Summary:</b> {apiData}
+        <b>AI Summary:</b> {callsData.length > 0 ? (apiData) : ("")}
       </p>
       <div className="mb-4 flex space-x-4">
         <select 
@@ -295,9 +309,20 @@ function App() {
           <option value="puts">Puts</option>
         </select>
       </div>
-      {callsData.length > 0 && (
+      {callsData.length > 0 ? (
         <div>
-          <OptionDetails options={getFilteredOptions()} />
+          <OptionDetails options={getFilteredOptions()} onContractSymbolClick={handleContractSymbolClick} />
+        </div>
+      ) : (
+        <div>
+          <p className="text-white font-bold text-lg">CURRENT OPTIONS CHAIN EXPIRED</p>
+          <p className="text-white font-semibold text-base">Press Search Again</p>
+        </div>
+      )}
+      {/* Render the separate component for the chart using selectedContractSymbol */}
+      {selectedContractSymbol && (
+        <div ref={chartRef}>
+          <ChartComponent contractSymbol={selectedContractSymbol} />
         </div>
       )}
     </div>

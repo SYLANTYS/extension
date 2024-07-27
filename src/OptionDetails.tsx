@@ -17,9 +17,10 @@ interface Option {
 
 interface OptionDetailsProps {
   options: Option[];
+  onContractSymbolClick: (contractSymbol: string) => void;  // Add callback prop
 }
 
-const OptionDetails: React.FC<OptionDetailsProps> = ({ options }) => {
+const OptionDetails: React.FC<OptionDetailsProps> = ({ options, onContractSymbolClick }) => {
   const headers = [
     "contractSymbol",
     "strike",
@@ -37,7 +38,7 @@ const OptionDetails: React.FC<OptionDetailsProps> = ({ options }) => {
   const formatValue = (key: string, value: any) => {
     switch (key) {
       case 'lastTradeDate':
-        return new Date(value * 1000).toLocaleDateString() + " " + new Date(value * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});;
+        return new Date(value * 1000).toLocaleDateString() + " " + new Date(value * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       case 'volume':
       case 'openInterest':
         return value !== undefined ? value.toFixed(0) : 'N/A';
@@ -88,7 +89,8 @@ const OptionDetails: React.FC<OptionDetailsProps> = ({ options }) => {
                 {headers.map((key) => (
                   <td
                     key={key}
-                    className={`px-3 py-2 whitespace-nowrap text-xs text-gray-700 border-b border-gray-200 ${getColorClass(key, option[key as keyof Option] as number)}`}
+                    className={`px-3 py-2 whitespace-nowrap text-xs text-gray-700 border-b border-gray-200 ${getColorClass(key, option[key as keyof Option] as number)} ${key === 'contractSymbol' ? 'cursor-pointer' : ''}`}
+                    onClick={key === 'contractSymbol' ? () => onContractSymbolClick(option.contractSymbol) : undefined}  // Trigger callback only for contractSymbol
                   >
                     {formatValue(key, option[key as keyof Option])}
                   </td>
