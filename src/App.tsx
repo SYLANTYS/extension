@@ -3,6 +3,7 @@ import './App.css';
 import OptionDetails from './OptionDetails';
 import ChartComponent from './ChartComponent';
 import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
+import { Toaster, toast } from 'react-hot-toast';
 
 interface Option {
   contractSymbol: string;
@@ -20,7 +21,7 @@ interface Option {
 }
 
 function App() {
-  const [apiData, setApiData] = useState<string>('Using the OpenAI 3.5 Turbo Instruct Model to generate company summaries. Enjoy!');
+  const [apiData, setApiData] = useState<string>("Using OpenAI's 3.5 Turbo Instruct Model to generate company summaries. Enjoy!");
   const [customPrompt, setCustomPrompt] = useState<string>('');
   const [callsData, setCallsData] = useState<Option[]>([]);
   const [putsData, setPutsData] = useState<Option[]>([]);
@@ -32,7 +33,6 @@ function App() {
   const [previousAskPrice, setPreviousAskPrice] = useState<number | null>(null);
   const [priceColor, setPriceColor] = useState<string>('text-white');
   const [selectedContractSymbol, setSelectedContractSymbol] = useState<string | null>(null);
-
   const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,23 +93,29 @@ function App() {
   };
 
   const handleSubmit = async () => {
-    try {
-      const openAiData = await fetchOpenAiData(customPrompt);
-      setApiData(openAiData);
-      storeDataInStorage({ apiData: openAiData, ticker: customPrompt }, () => {
-        console.log('API data stored in chrome.storage');
-      });
+    const toastId = toast.loading('Loading...'); // Show toaster
 
-      const expirationDates = await fetchExpirationDates(customPrompt);
-      if (expirationDates.length > 0) {
-        setSelectedDate(expirationDates[0]);
-        storeDataInStorage({ selectedDate : expirationDates[0] }, () => {
-          console.log('Selected date stored in chrome.storage');
+    try {
+        const openAiData = await fetchOpenAiData(customPrompt);
+        setApiData(openAiData);
+        storeDataInStorage({ apiData: openAiData, ticker: customPrompt }, () => {
+            console.log('API data stored in chrome.storage');
         });
-        await fetchOptionsData(expirationDates[0]);
-      }
+
+        const expirationDates = await fetchExpirationDates(customPrompt);
+        if (expirationDates.length > 0) {
+            setSelectedDate(expirationDates[0]);
+            storeDataInStorage({ selectedDate: expirationDates[0] }, () => {
+                console.log('Selected date stored in chrome.storage');
+            });
+            await fetchOptionsData(expirationDates[0]);
+        }
+
+        toast.success('Data loaded successfully!', { id: toastId }); // Success notification
     } catch (error) {
-      console.error(error);
+        console.error(error);
+        toast.error('Failed to load data.', { id: toastId }); // Error notification
+    } finally {
     }
   };
 
@@ -260,6 +266,7 @@ function App() {
           />
         </div>
       )}
+      <Toaster/>
       <div className="mb-4 flex justify-center items-center">
         <div className='flex justify-center border border-gray-300 rounded-xl bg-gray-700'>
           <input 
@@ -277,46 +284,46 @@ function App() {
         </div>
       </div>
       <p className="mb-4 mx-16 text-white text-left">
-        <b>AI Summary:</b> {callsData.length > 0 ? (apiData) : ("")}
+        <b>AI Summary:</b> {apiData}
       </p>
-      <div className="mb-4 flex space-x-4">
-        <select 
-          value={selectedDate ?? (expirationDates.length > 0 ? expirationDates[0] : '')}
-          onChange={handleDateChange}
-          className="border border-gray-300 p-2 mt-1 block w-full rounded-2xl text-white bg-gray-700 hover:bg-gray-600"
-        >
-          {expirationDates.map((date) => (
-            <option key={date} value={date}>{formatDate(date)}</option>
-          ))}
-        </select>
-        <select 
-          id="numberOfOptions" 
-          value={numberOfOptions} 
-          onChange={handleNumberOfOptionsChange} 
-          className="border border-gray-300 p-2 mt-1 block w-full rounded-2xl text-white bg-gray-700 hover:bg-gray-600"
-        >
-          <option value="5">10 Strike Prices</option>
-          <option value="10">20</option>
-          <option value="all">All</option>
-        </select>
-        <select 
-          id="typeOfOptions" 
-          value={typeOfOptions} 
-          onChange={handleTypeOfOptionsChange}
-          className="border border-gray-300 p-2 mt-1 block w-full rounded-2xl text-white bg-gray-700 hover:bg-gray-600"
-        >
-          <option value="calls">Calls</option>
-          <option value="puts">Puts</option>
-        </select>
-      </div>
       {callsData.length > 0 ? (
         <div>
+          <div className="mb-4 flex space-x-4">
+            <select 
+              value={selectedDate ?? (expirationDates.length > 0 ? expirationDates[0] : '')}
+              onChange={handleDateChange}
+              className="border border-gray-300 p-2 mt-1 block w-full rounded-2xl text-white bg-gray-700 hover:bg-gray-600"
+            >
+              {expirationDates.map((date) => (
+                <option key={date} value={date}>{formatDate(date)}</option>
+              ))}
+            </select>
+            <select 
+              id="numberOfOptions" 
+              value={numberOfOptions} 
+              onChange={handleNumberOfOptionsChange} 
+              className="border border-gray-300 p-2 mt-1 block w-full rounded-2xl text-white bg-gray-700 hover:bg-gray-600"
+            >
+              <option value="5">10 Strike Prices</option>
+              <option value="10">20</option>
+              <option value="all">All</option>
+            </select>
+            <select 
+              id="typeOfOptions" 
+              value={typeOfOptions} 
+              onChange={handleTypeOfOptionsChange}
+              className="border border-gray-300 p-2 mt-1 block w-full rounded-2xl text-white bg-gray-700 hover:bg-gray-600"
+            >
+              <option value="calls">Calls</option>
+              <option value="puts">Puts</option>
+            </select>
+          </div>
           <OptionDetails options={getFilteredOptions()} onContractSymbolClick={handleContractSymbolClick} />
         </div>
       ) : (
         <div>
-          <p className="text-white font-bold text-lg">CURRENT OPTIONS CHAIN EXPIRED</p>
-          <p className="text-white font-semibold text-base">Press Search Again</p>
+          <p className="text-white font-bold text-lg">Search For a Stock!</p>
+          <p className="text-white">TSLA, AAPL, MSFT, META, GOOG, GME, SPY</p>
         </div>
       )}
       {/* Render the separate component for the chart using selectedContractSymbol */}
