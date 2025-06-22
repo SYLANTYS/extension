@@ -89,7 +89,7 @@ const OptionDetails: React.FC<OptionDetailsProps> = ({ options, onContractSymbol
                 {headers.map((key) => (
                   <td
                     key={key}
-                    className={`px-3 py-2 whitespace-nowrap text-xs text-gray-700 border-b border-gray-200 ${getColorClass(key, option[key as keyof Option] as number)} ${key === 'contractSymbol' ? 'cursor-pointer' : ''}`}
+                    className={`px-3 py-2 whitespace-nowrap text-xs text-gray-700 border-b border-gray-200 ${getColorClass(key, option[key as keyof Option] as number)} ${key === 'contractSymbol' ? 'cursor-pointer hover:text-blue-500' : ''}`}
                     onClick={key === 'contractSymbol' ? () => onContractSymbolClick(option.contractSymbol) : undefined}  // Trigger callback only for contractSymbol
                   >
                     {formatValue(key, option[key as keyof Option])}

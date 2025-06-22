@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Options Chains",
-  "version": "1.0.4",
-  "description": "This Chrome extension loads the current options chain for your selected ticker (Ex. TSLA) from a Yahoo Finance API.",
+  "version": "1.0.5",
+  "description": "This Chrome extension loads the current options chain for your selected stock ticker (Ex. TSLA) from YH Finance API.",
   "icons": {
     "16": "1.png",
     "32": "1.png",
@@ -22,7 +22,5 @@
     "default_popup": "index.html",
     "default_icon": "1.png"
   },
-  "permissions": [
-    "storage"
-  ]
+  "permissions": ["storage"]
 }
