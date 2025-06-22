@@ -141,7 +141,7 @@ function App() {
   };
 
   const fetchOpenAiData = async (prompt: string): Promise<string> => {
-    const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     const url = "https://api.openai.com/v1/completions";
 
     const response = await fetch(url, {
@@ -170,7 +170,7 @@ function App() {
       {
         headers: {
           accept: "application/json",
-          "X-API-KEY": process.env.REACT_APP_YAHOO_FINANCE_API_KEY,
+          "X-API-KEY": import.meta.env.VITE_YAHOO_FINANCE_API_KEY,
         },
       }
     );
@@ -216,7 +216,7 @@ function App() {
       {
         headers: {
           accept: "application/json",
-          "X-API-KEY": process.env.REACT_APP_YAHOO_FINANCE_API_KEY,
+          "X-API-KEY": import.meta.env.VITE_YAHOO_FINANCE_API_KEY,
         },
       }
     );

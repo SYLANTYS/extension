@@ -104,7 +104,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({ contractSymbol }) => {
         {
           headers: {
             accept: "application/json",
-            "X-API-KEY": process.env.REACT_APP_YAHOO_FINANCE_API_KEY,
+            "X-API-KEY": import.meta.env.VITE_YAHOO_FINANCE_API_KEY,
           },
         }
       );

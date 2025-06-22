@@ -1,6 +1,6 @@
 //DIST FILE: npm run build
 
-const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 const googleUrl = new URL(window.location.href);
 const search = googleUrl.search;
 const searchParam = new URLSearchParams(search);
